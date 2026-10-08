@@ -59,6 +59,20 @@ Abra o link no celular e faça login:
 - Limites do Free: 500 MB de banco e 1 GB de arquivos. As fotos são comprimidas antes de subir (~200 KB cada), então cabem milhares.
 - O leitor de notas foi feito pro layout do extrato da **Usina Santa Rita**. Se o formato mudar ou entrar outra usina, ajuste a função `extrairDadosDaNota` em `ocr.js`.
 
+## Atualizando o app
+
+Pra subir uma versão nova sem perder a configuração: no GitHub, **Add file → Upload files** e arraste os arquivos/pastas da atualização. Arquivos com o mesmo nome são substituídos; os outros continuam lá. **Nunca envie um `config.js` com `COLE_AQUI`** por cima do seu.
+
+Depois do commit, espere 1–2 minutos e, no celular, feche e abra o app de novo.
+
+## Dicas de uso (versão 2)
+
+- **Botão + no meio da barra**: registra uma viagem. "Tirar foto" abre a câmera e o app lê a nota.
+- **Toque numa viagem** pra ver o extrato, as fotos, mudar a situação ou marcar como paga.
+- **Motoristas → toque no motorista → Acerto**: mostra o que está a pagar, manda o extrato no WhatsApp e marca tudo como pago de uma vez.
+- **Ajustes** (ícone no canto de cima): valor por tonelada, tema claro/escuro e **letra grande**.
+- O botão **voltar** do Android fecha a janela aberta e, fora do Início, volta pro Início.
+
 ---
 
 ## Estrutura
@@ -70,11 +84,11 @@ ocr.js              leitura das notas (Tesseract) + extração dos campos
 config.js           URL e chave pública do Supabase  ← editar
 manifest.json       permite instalar como app
 supabase/schema.sql estrutura do banco + segurança + storage + tempo real
-vendor/             bibliotecas locais (React, Supabase, Babel, Tesseract, CSS)
+vendor/             bibliotecas locais (React, Supabase, Babel, Tesseract, CSS e fontes)
 icons/              ícones do app
 ```
 
-Todas as bibliotecas ficam dentro do repositório. O app não depende de nenhum CDN (só das fontes do Google, que têm fallback).
+Todas as bibliotecas e as fontes ficam dentro do repositório. O app não depende de nenhum servidor externo além do Supabase.
 
 Para editar: mude `app.jsx`, faça commit e o GitHub Pages atualiza sozinho. Se o celular continuar mostrando a versão antiga, feche e abra o app de novo.
 

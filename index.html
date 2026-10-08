@@ -2,26 +2,68 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#1F3D2B" />
+<!-- interactive-widget: no Android, o teclado encolhe a tela em vez de cobrir o botão de salvar -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta name="theme-color" content="#F2F4EF" />
+<meta name="color-scheme" content="light dark" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="CanaLog" />
+<meta name="format-detection" content="telephone=no" />
 <title>CanaLog</title>
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
 <link rel="apple-touch-icon" href="icons/icon-180.png" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+<link rel="preload" href="vendor/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="vendor/fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="vendor/tailwind.css" />
 <style>
-  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  html, body { height: 100%; margin: 0; background: #F7F3EA; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #241F16; letter-spacing: -0.01em; }
-  html.dark, html.dark body { background: #171712; color: #F3EEE1; }
-  #root { height: 100%; }
+  @font-face { font-family: 'Plus Jakarta Sans'; src: url('vendor/fonts/jakarta.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+  @font-face { font-family: 'Bricolage Grotesque'; src: url('vendor/fonts/bricolage.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+
+  /* Cores do app (R G B). O modo escuro só troca os valores. */
+  :root {
+    --c-bg: 242 244 239;       --c-surface: 255 255 255;   --c-surface2: 231 235 228;
+    --c-line: 218 224 214;     --c-ink: 20 32 24;          --c-muted: 92 104 95;
+    --c-brand: 30 90 54;       --c-brandink: 30 90 54;     --c-onbrand: 255 255 255;
+    --c-hero: 22 66 41;        --c-gold: 226 163 36;       --c-ongold: 28 26 16;
+    --c-danger: 180 65 43;
+    --c-rota-bg: 225 235 244;  --c-rota-fg: 44 86 116;
+    --c-pagar-bg: 251 235 200; --c-pagar-fg: 128 82 8;
+    --c-pago-bg: 221 240 226;  --c-pago-fg: 28 104 56;
+  }
+  .dark {
+    --c-bg: 14 20 16;          --c-surface: 23 32 25;      --c-surface2: 33 44 36;
+    --c-line: 44 56 47;        --c-ink: 234 240 231;       --c-muted: 152 165 155;
+    --c-brand: 47 128 80;      --c-brandink: 140 212 164;  --c-onbrand: 255 255 255;
+    --c-hero: 20 56 35;        --c-gold: 237 182 70;       --c-ongold: 28 26 16;
+    --c-danger: 236 128 104;
+    --c-rota-bg: 28 42 54;     --c-rota-fg: 156 195 226;
+    --c-pagar-bg: 58 44 16;    --c-pagar-fg: 240 196 106;
+    --c-pago-bg: 22 50 34;     --c-pago-fg: 143 211 166;
+  }
+
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  html.letra-grande { font-size: 18.5px; }
+  html, body { height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; }
+  body {
+    background: rgb(var(--c-bg)); color: rgb(var(--c-ink));
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* A raiz fica PRESA na tela: só o miolo do app rola. É isso que acaba com o
+     rodapé "descolando" quando a barra do navegador aparece/some no celular. */
+  #root { position: fixed; inset: 0; height: 100%; height: 100dvh; }
   * { -webkit-tap-highlight-color: transparent; }
+  button, a { touch-action: manipulation; }
+  input, select, textarea { font: inherit; }
   input[type=number] { -moz-appearance: textfield; }
   input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=search]::-webkit-search-cancel-button { display: none; }
+  input[type=date] { min-height: 3rem; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 </style>
 </head>
 <body>

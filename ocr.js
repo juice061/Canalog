@@ -13,7 +13,12 @@ async function getOcrWorker() {
       corePath: urlLocal('vendor/tesseract/'),   // escolhe sozinho a versão mais rápida pro aparelho
       langPath: urlLocal('vendor/tesseract/'),   // carrega vendor/tesseract/por.traineddata.gz
       gzip: true,
-      logger: (m) => { if (m.status) console.log('[OCR]', m.status, Math.round((m.progress || 0) * 100) + '%'); },
+      logger: (m) => {
+        if (!m.status) return;
+        console.log('[OCR]', m.status, Math.round((m.progress || 0) * 100) + '%');
+        // a tela de nova viagem escuta isso pra mostrar a barra de progresso
+        if (typeof window.__ocrOnProgress === 'function') { try { window.__ocrOnProgress(m); } catch (e) {} }
+      },
     }).catch((e) => { window.__ocrWorkerPromise = null; throw e; });
   }
   return window.__ocrWorkerPromise;
