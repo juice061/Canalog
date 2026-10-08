@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1F3D2B" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CanaLog" />
+<title>CanaLog</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+<link rel="stylesheet" href="vendor/tailwind.css" />
+<style>
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html, body { height: 100%; margin: 0; background: #F7F3EA; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #241F16; letter-spacing: -0.01em; }
+  html.dark, html.dark body { background: #171712; color: #F3EEE1; }
+  #root { height: 100%; }
+  * { -webkit-tap-highlight-color: transparent; }
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Bibliotecas (todas dentro do repositório, nada depende de CDN) -->
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="vendor/supabase.js"></script>
+<script src="vendor/tesseract.min.js"></script>
+<script src="vendor/babel.min.js"></script>
+
+<!-- Configuração do Supabase (edite este arquivo) -->
+<script src="config.js"></script>
+<!-- Leitura das notas (OCR) -->
+<script src="ocr.js"></script>
+<!-- App -->
+<script type="text/babel" data-presets="react" src="app.jsx"></script>
+</body>
+</html>
