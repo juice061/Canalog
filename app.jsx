@@ -2,7 +2,7 @@
 // (força o modo clássico do JSX: evita a tela branca do runtime automático do Babel)
 const { useState, useEffect, useMemo, useRef, useCallback, createContext, useContext } = React;
 
-const VERSAO = '2.0';
+const VERSAO = '2.0.2';
 
 /* =============================================================================
    Formatação e datas (sempre no fuso do aparelho — nada de UTC)
@@ -728,9 +728,9 @@ function Painel() {
       </div>
       <div className="text-sm text-white/75 mt-1 relative">transportadas · {fmtBRL(total)} em fretes</div>
 
-      <div className="mt-5 flex h-2.5 rounded-full overflow-hidden gap-[2px] bg-white/10 relative" role="img" aria-label={`Pago ${fmtBRL(r.pago)}, a pagar ${fmtBRL(r.aPagar)}, em rota ${fmtBRL(r.emRota)}`}>
-        {total > 0 && partes.filter((p) => p.valor > 0).map((p) => <div key={p.chave} className={p.cor} style={{ width: `${(p.valor / total) * 100}%` }} />)}
-      </div>
+      {total > 0 && <div className="mt-5 flex h-2.5 rounded-full overflow-hidden gap-[2px] bg-white/10 relative" role="img" aria-label={`Pago ${fmtBRL(r.pago)}, a pagar ${fmtBRL(r.aPagar)}, em rota ${fmtBRL(r.emRota)}`}>
+        {partes.filter((p) => p.valor > 0).map((p) => <div key={p.chave} className={p.cor} style={{ width: `${(p.valor / total) * 100}%` }} />)}
+      </div>}
       <div className="mt-3 flex flex-col gap-1.5 relative">
         {partes.map((p) => (
           <div key={p.chave} className="flex items-center gap-2 text-sm">
@@ -749,6 +749,45 @@ function Painel() {
         </span>
       </div>
     </section>
+  );
+}
+
+function Passo({ n, feito, titulo, texto, extra, acao }) {
+  return (
+    <div className={`rounded-2xl border p-4 flex flex-col gap-3 ${feito ? 'bg-surface border-line' : 'bg-surface border-brand/40 ring-1 ring-brand/20'}`}>
+      <div className="flex items-start gap-3">
+        <span className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-display font-bold ${feito ? 'bg-pago-bg text-pago-fg' : 'bg-brand text-onbrand'}`}>
+          {feito ? <I.check size={19} /> : n}
+        </span>
+        <div className="min-w-0">
+          <div className="font-display text-lg font-bold text-ink leading-tight">{titulo}</div>
+          <p className="text-sm text-muted leading-relaxed mt-1">{texto}</p>
+          {extra && <p className="text-sm font-semibold text-pago-fg mt-1.5">{extra}</p>}
+        </div>
+      </div>
+      {acao}
+    </div>
+  );
+}
+
+function PrimeirosPassos() {
+  const { motoristas } = useApp();
+  const ui = useUI();
+  const temMotorista = motoristas.length > 0;
+  return (
+    <div className="flex flex-col gap-4 pt-2">
+      <div className="px-1">
+        <h2 className="font-display text-2xl font-bold text-ink">Vamos começar</h2>
+        <p className="text-muted mt-1">Dois passos e o app fica pronto pra safra.</p>
+      </div>
+      <Passo n={1} feito={temMotorista} titulo="Cadastre os motoristas"
+        texto="Use o nº que aparece na nota da usina. Assim o app reconhece sozinho quem fez cada viagem."
+        extra={temMotorista ? plural(motoristas.length, 'motorista cadastrado', 'motoristas cadastrados') : null}
+        acao={<Botao variante={temMotorista ? 'secundario' : 'primario'} icone={<I.mais size={20} />} onClick={ui.novoMotorista}>{temMotorista ? 'Cadastrar outro motorista' : 'Cadastrar motorista'}</Botao>} />
+      <Passo n={2} titulo="Registre a primeira viagem"
+        texto="Tire uma foto da nota de pesagem. O app lê a nota e preenche fazenda, usina, peso, data e motorista."
+        acao={<Botao variante="ouro" icone={<I.camera size={20} />} onClick={ui.novaViagem}>Registrar viagem</Botao>} />
+    </div>
   );
 }
 
@@ -781,6 +820,8 @@ function TelaInicio() {
   }, [filtradas, limite]);
 
   const chips = [['todas', 'Todas'], ['em_rota', 'Em rota'], ['pendente', 'A pagar'], ['pago', 'Pago']];
+
+  if (viagens.length === 0) return <PrimeirosPassos />;
 
   return (
     <div className="flex flex-col gap-6">
