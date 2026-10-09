@@ -2,7 +2,7 @@
 // (força o modo clássico do JSX: evita a tela branca do runtime automático do Babel)
 const { useState, useEffect, useMemo, useRef, useCallback, createContext, useContext } = React;
 
-const VERSAO = '2.0.2';
+const VERSAO = '2.0.3';
 
 /* =============================================================================
    Formatação e datas (sempre no fuso do aparelho — nada de UTC)
@@ -1379,20 +1379,6 @@ function TelaRelatorios() {
     return [...acc.entries()].map(([nome, a]) => ({ nome, ...a })).sort((a, b) => b.ton - a.ton);
   }, [lista]);
 
-  async function compartilhar() {
-    const linhas = [
-      `*CanaLog — ${rotuloPeriodo}*`,
-      `${plural(lista.length, 'viagem', 'viagens')} · ${fmtTon(ton)} · ${fmtBRL(valor)}`,
-      `Pago: ${fmtBRL(pago)} | A pagar: ${fmtBRL(aPagar)}${emRota ? ` | Em rota: ${fmtBRL(emRota)}` : ''}`,
-      '',
-      ...ranking.filter((r) => r.qtd > 0).map((r) => `• ${r.nome}: ${plural(r.qtd, 'viagem', 'viagens')}, ${fmtTon(r.ton)}, ${fmtBRL(r.valor)}`),
-    ];
-    const texto = linhas.join('\n');
-    try {
-      if (navigator.share) { await navigator.share({ text: texto }); return; }
-    } catch (e) { if (e?.name === 'AbortError') return; }
-    window.open(linkWhatsApp('', texto), '_blank');
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -1470,7 +1456,6 @@ function TelaRelatorios() {
         </Secao>
       )}
 
-      <Botao variante="contorno" icone={<I.compartilhar size={20} />} onClick={compartilhar} disabled={lista.length === 0}>Compartilhar resumo</Botao>
     </div>
   );
 }
@@ -1603,12 +1588,6 @@ function DetalheMotorista({ id, onClose }) {
   useEffect(() => { if (!m) onClose(); }, [m]);
   if (!m) return null;
 
-  const textoAcerto = [
-    `*Acerto — ${m.nome}*`,
-    ...pendentes.map((v) => `${fmtDataCurta(v.data)} · ${v.produtor}${v.destino ? ` → ${v.destino}` : ''} · ${fmtTon(v.toneladas)} · ${fmtBRL(v.valor)}`),
-    '',
-    `Total: ${plural(pendentes.length, 'viagem', 'viagens')} · ${fmtTon(tonPend)} · *${fmtBRL(totalPend)}*`,
-  ].join('\n');
 
   async function pagarTudo() {
     const ok = await confirmar({ titulo: 'Marcar tudo como pago?', texto: `${plural(pendentes.length, 'viagem', 'viagens')} de ${m.nome}, total de ${fmtBRL(totalPend)}, vão para "Pago".`, confirmar: 'Marcar como pago' });
@@ -1630,13 +1609,7 @@ function DetalheMotorista({ id, onClose }) {
           {!m.ativo && <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-surface2 text-muted">Inativo</span>}
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <a href={m.telefone ? `tel:${m.telefone.replace(/[^\d+]/g, '')}` : undefined} aria-disabled={!m.telefone}
-            className={`flex flex-col items-center gap-1 rounded-2xl bg-surface border border-line py-3 text-sm font-semibold text-ink ${m.telefone ? '' : 'opacity-40 pointer-events-none'}`}><I.telefone size={21} />Ligar</a>
-          <a href={m.telefone ? linkWhatsApp(m.telefone, '') : undefined} target="_blank" rel="noopener" aria-disabled={!m.telefone}
-            className={`flex flex-col items-center gap-1 rounded-2xl bg-surface border border-line py-3 text-sm font-semibold text-ink ${m.telefone ? '' : 'opacity-40 pointer-events-none'}`}><I.whats size={21} />WhatsApp</a>
-          <button onClick={() => ui.editarMotorista(m.id)} className={`flex flex-col items-center gap-1 rounded-2xl bg-surface border border-line py-3 text-sm font-semibold text-ink ${FOCO}`}><I.lapis size={21} />Editar</button>
-        </div>
+        <Botao variante="secundario" icone={<I.lapis size={19} />} onClick={() => ui.editarMotorista(m.id)}>Editar motorista</Botao>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-2xl bg-surface border border-line p-4"><div className="text-sm text-muted">Viagens</div><div className="font-display text-2xl font-bold text-ink tabular-nums mt-0.5">{historico.length}</div></div>
@@ -1662,9 +1635,8 @@ function DetalheMotorista({ id, onClose }) {
                 ))}
                 {pendentes.length > 8 && <div className="px-4 py-2.5 text-sm text-muted">e mais {plural(pendentes.length - 8, 'viagem', 'viagens')}…</div>}
               </div>
-              <div className="p-3 grid grid-cols-2 gap-2 border-t border-line">
-                <a href={linkWhatsApp(m.telefone, textoAcerto)} target="_blank" rel="noopener" className={`inline-flex items-center justify-center gap-2 h-12 rounded-xl bg-surface2 text-ink font-semibold ${TOQUE}`}><I.whats size={20} />Enviar</a>
-                <Botao icone={<I.check size={19} />} onClick={pagarTudo} disabled={pagando}>{pagando ? 'Marcando…' : 'Pagar tudo'}</Botao>
+              <div className="p-3 border-t border-line">
+                <Botao className="w-full" icone={<I.check size={19} />} onClick={pagarTudo} disabled={pagando}>{pagando ? 'Marcando…' : 'Marcar tudo como pago'}</Botao>
               </div>
             </div>
           )}
@@ -1747,7 +1719,7 @@ function FormMotorista({ id, onClose }) {
           <Botao type="button" variante="secundario" tamanho="p" icone={<I.camera size={18} />} onClick={() => inputFotoRef.current?.click()}>{fotoUrl ? 'Trocar foto' : 'Adicionar foto'}</Botao>
         </div>
         <Campo rotulo="Nome"><input className={INPUT} value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Edson Ferreira" autoCapitalize="words" /></Campo>
-        <Campo rotulo="Telefone (WhatsApp)"><input className={INPUT} inputMode="tel" value={telefone} onChange={(e) => setTelefone(mascaraTelefone(e.target.value))} placeholder="(16) 99123-4567" /></Campo>
+        <Campo rotulo="Telefone (opcional)"><input className={INPUT} inputMode="tel" value={telefone} onChange={(e) => setTelefone(mascaraTelefone(e.target.value))} placeholder="(16) 99123-4567" /></Campo>
         <Campo rotulo="Placa do caminhão"><input className={`${INPUT} uppercase`} value={placa} onChange={(e) => setPlaca(e.target.value.toUpperCase())} placeholder="ABC1D23" autoCapitalize="characters" /></Campo>
         <div className="rounded-2xl bg-surface border border-line p-4 flex flex-col gap-3">
           <div>
