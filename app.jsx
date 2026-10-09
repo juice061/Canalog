@@ -2,7 +2,7 @@
 // (força o modo clássico do JSX: evita a tela branca do runtime automático do Babel)
 const { useState, useEffect, useMemo, useRef, useCallback, createContext, useContext } = React;
 
-const VERSAO = '2.0.3';
+const VERSAO = '2.0.4';
 
 /* =============================================================================
    Formatação e datas (sempre no fuso do aparelho — nada de UTC)
@@ -2050,6 +2050,28 @@ function App() {
     </AppProvider>
   );
 }
+
+// ============================================================================
+// Atualização automática: o celular guarda a versão antiga do app por um tempo.
+// Toda vez que o app abre (ou volta pra tela), ele confere o versao.json no
+// GitHub sem usar cache. Se tiver versão nova, recarrega sozinho — mas só
+// quando não tem nenhuma janela aberta (pra não perder nada que tá digitando).
+// ============================================================================
+async function verificarAtualizacao() {
+  try {
+    const r = await fetch('versao.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const { versao } = await r.json();
+    if (!versao || versao === VERSAO) return;
+    if (pilhaVoltar.length || document.visibilityState !== 'visible') return;
+    const chave = 'canalog-tentou-' + versao;
+    try { if (sessionStorage.getItem(chave)) return; sessionStorage.setItem(chave, '1'); } catch (e) { return; }
+    console.log('[CanaLog] nova versão', versao, '— recarregando');
+    location.replace(location.pathname + '?v=' + encodeURIComponent(versao));
+  } catch (e) { /* sem internet: tenta na próxima */ }
+}
+verificarAtualizacao();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verificarAtualizacao(); });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <PrefProvider><ToastProvider><App /></ToastProvider></PrefProvider>

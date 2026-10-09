@@ -63,13 +63,13 @@ Abra o link no celular e faça login:
 
 Pra subir uma versão nova sem perder a configuração: no GitHub, **Add file → Upload files** e arraste os arquivos/pastas da atualização. Arquivos com o mesmo nome são substituídos; os outros continuam lá. **Nunca envie um `config.js` com `COLE_AQUI`** por cima do seu.
 
-Depois do commit, espere 1–2 minutos e, no celular, feche e abra o app de novo.
+Depois do commit, espere uns minutos. Desde a 2.0.4 o app se atualiza sozinho: ao abrir, ele confere o `versao.json` e, se tiver versão nova, recarrega. Por isso toda atualização tem que levar o `versao.json` junto (com o mesmo número do `VERSAO` no `app.jsx`).
 
 ## Dicas de uso (versão 2)
 
 - **Botão + no meio da barra**: registra uma viagem. "Tirar foto" abre a câmera e o app lê a nota.
 - **Toque numa viagem** pra ver o extrato, as fotos, mudar a situação ou marcar como paga.
-- **Motoristas → toque no motorista → Acerto**: mostra o que está a pagar, manda o extrato no WhatsApp e marca tudo como pago de uma vez.
+- **Motoristas → toque no motorista → Acerto**: mostra o que está a pagar e marca tudo como pago de uma vez.
 - **Ajustes** (ícone no canto de cima): valor por tonelada, tema claro/escuro e **letra grande**.
 - O botão **voltar** do Android fecha a janela aberta e, fora do Início, volta pro Início.
 
@@ -78,7 +78,7 @@ Depois do commit, espere 1–2 minutos e, no celular, feche e abra o app de novo
 ## Estrutura
 
 ```
-index.html          página principal (carrega tudo)
+index.html          página principal (já traz o CSS e as fontes embutidos)
 app.jsx             o app (React + JSX, compilado no navegador pelo Babel)
 ocr.js              leitura das notas (Tesseract) + extração dos campos
 config.js           URL e chave pública do Supabase  ← editar
@@ -92,8 +92,9 @@ Todas as bibliotecas e as fontes ficam dentro do repositório. O app não depend
 
 Para editar: mude `app.jsx`, faça commit e o GitHub Pages atualiza sozinho. Se o celular continuar mostrando a versão antiga, feche e abra o app de novo.
 
-Se mudar alguma classe de estilo nova (Tailwind) que ainda não existia no app, ela precisa estar em `vendor/tailwind.css`, que é gerado com:
+O CSS do Tailwind e as fontes ficam **embutidos no `index.html`** (assim uma atualização nunca depende de subir pasta). Se usar alguma classe nova do Tailwind no `app.jsx`, regenere e embuta:
 ```
 npx tailwindcss@3 -c dev/tailwind.config.js -i dev/in.css -o vendor/tailwind.css --minify
+python dev/montar.py
 ```
 (rodando na raiz do repositório; a configuração está na pasta `dev/`).
